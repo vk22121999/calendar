@@ -1,0 +1,5 @@
+export default (date) => {
+  var d = new Date(date);
+  // return `${d.getHours()}:${d.getMinutes()}, ${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`
+  return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`
+}

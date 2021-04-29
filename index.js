@@ -2,10 +2,12 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const mongoose = require("mongoose");
+var cors = require('cors');
 require("dotenv").config();
 
 app.use(express.json());
 
+app.use(cors())
 
 mongoose.connect(`${process.env.DATABASE}`, {
   useNewUrlParser: true,

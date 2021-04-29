@@ -9,6 +9,7 @@ const signUp = async (req, res) => {
     });
     if (existingAccount) {
       return res.status(400).json({
+        error:{},
         message: "Account with same email already exists",
       });
     }
@@ -22,23 +23,24 @@ const signUp = async (req, res) => {
     });
     newUser = await newUser.save();
     console.log(newUser._id);
-    return res.status(200).json({ message: "Sign-up Completed" });
+    return res.status(200).json({ message: "Sign-up Completed",user:{name:req.body.name,email:req.body.email,events:[]} });
   } catch (e) {
     console.log(e);
-    res.status(400).json({ message: "Some error occured :(" });
+    res.status(400).json({ message: "Some error occured :(",error:e });
   }
 }
 
 const signIn = async (req, res) => {
   try {
     let user = await UserModel.findOne({ email: req.body.email });
+ 
     if (!user) {
-      return res.status(400).json({ message: "No such account found..." });
+      return res.status(400).json({ message: "No such account found...",error:{} });
     }
 
     const verify = bcrypt.compareSync(req.body.password, user.password);
     if (!verify) {
-      return res.status(400).json({ message: "Invalid Credentials.." });
+      return res.status(400).json({ message: "Invalid Credentials.." ,error:{}});
     }
 
     let token = "";
@@ -47,11 +49,11 @@ const signIn = async (req, res) => {
   
     delete user.password
     return res.status(200).json({
-      message: "Login Succesfull", data: { user, token }
+      message: "Login Succesfull", user: { ...user, token }
     });
   } catch (e) {
     console.log(e);
-    res.status(400).json({ message: "Some error occured :(" });
+    res.status(400).json({error:e, message: "Some error occured :(" });
   }
 }
 

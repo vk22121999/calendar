@@ -3,11 +3,11 @@ const UserModel = require("../models/user");
 const fetchEvents = async(req,res) =>{
     try{
 
-        const user = await UserModel.findOne({_id:req.userData._id})
+        const user = await UserModel.find({_id:req.userData._id})
+ 
+      
 
-        user.events.sort({startDate:1})
-
-        res.status(200).send({ events: user.events });
+        res.status(200).send({ events: user[0].events });
     }
     catch(e)
     {
@@ -18,14 +18,20 @@ const fetchEvents = async(req,res) =>{
 const addEvent = async (req, res) => {
 
     const newEvent = req.body;
+  
   try {
-    let user = await UserModel.updateOne({_id:req.UserData._id},{
-        "events":{
-            $addtoSet:newEvent
-        }
-    });
+    let user = await UserModel.findByIdAndUpdate( req.userData._id,{
+      $push: {
+        events: {
+           $each: [ {...newEvent,startDate:new Date(newEvent.startDate),endDate:new Date(newEvent.endDate)}],
+           $sort: { startDate: -1 },
 
-    res.status(200).json({ message: "Event Added" });
+        }
+      }
+    });
+    let userNew = await UserModel.findById(req.userData._id);
+
+    res.status(200).json({ message: "Event Added" ,events:userNew.events});
   } catch (e) {
     console.log(e);
     res.status(400).json({ message: "Some error occured :(" });

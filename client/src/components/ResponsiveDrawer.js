@@ -1,4 +1,4 @@
-  import React, { useEffect } from 'react';
+  import React, { useEffect,useState } from 'react';
   import AddIcon from '@material-ui/icons/Add';
   import agent from "../agent";
   import CssBaseline from '@material-ui/core/CssBaseline';
@@ -41,21 +41,32 @@ import { EVENT_ADD, UPDATE_EVENT_FIELD } from '../constants/actionTypes';
         width: "85%",
         flexShrink: 0,
       },
+    },
+    addbutton:
+    {
+      width:"100%",
+      padding:"0.8rem 2rem",
+      borderRadius:"25px",
+       [theme.breakpoints.down('sm')]: {
+        width: "100%",
+        fontSize:"0.6rem",
+        padding:"0.6rem 1rem",
+      },
     }
 
   }));
 
   const getMinDate = () =>
   {
-      return moment().format("yyyy-MM-DD")+"T"+moment().format("hh:mm")
+      return moment().format("yyyy-MM-DD")+"T"+moment().format("HH:mm")
   }
   const getFormatDate = (val) =>
   {
-      return moment(val).format("yyyy-MM-DDThh:mm")
+      return moment(val).format("yyyy-MM-DDTHH:mm")
   }
   const parseDate =(val) =>
   {
-     return moment(val,"yyyy-MM-DDThh:mm").toDate()
+     return moment(val,"yyyy-MM-DDTHH:mm").toDate()
   }
   const mapStateToProps = state => ({
     ...state.event,
@@ -66,24 +77,85 @@ import { EVENT_ADD, UPDATE_EVENT_FIELD } from '../constants/actionTypes';
   const mapDispatchToProps = dispatch => ({
 
     onUpdatefield:(key,value) =>
-      dispatch({ type: UPDATE_EVENT_FIELD , payload:{ key,value  }})
+      dispatch({ type: UPDATE_EVENT_FIELD , payload:{key,value}})
     ,
     onAddEvent:(payload) =>
-     dispatch({type:EVENT_ADD,payload})  
+     dispatch({type:EVENT_ADD,payload:payload})  
     });
 
-  
+  const getDiff = (startDate,endDate) =>
+  {
+    var m1 = moment(startDate); 
+var m2 = moment(endDate); 
+  return m2.diff(m1,'minutes'); 
+  }
   function ResponsiveDrawer(props) {
     const { window,title,description,startDate,endDate,onAddEvent,onUpdatefield } = props;
     const classes = useStyles();
+    const [startDateError,setStartDateError] = useState("");
+    const [endDateError,setEndDateError] = useState("")
     const handleChange = (name,value) =>
     {
+      
+        if(name==="startDate")
+        {  console.log("startDate",value)
+          if(value.getTime()<=new Date().getTime())
+          {
+            
+            setStartDateError("Event start date is not valid")
+          }
+          else if(endDate!==""&&value.getTime()>=endDate.getTime())
+          {
+            setStartDateError("Event start date is after end date")
+           
+          }
+          else if(endDate!==""&&getDiff(value,endDate)<5)
+          {
+            
+            setEndDateError("Event duration must be greater than 5 minutes")
+            
+          }
+          else
+          {
+            setStartDateError("")
+          }
         
+
+        }
+        else if(name==="endDate")
+        {
+          console.log("endDate",value)
+          if(value.getTime()<=new Date().getTime())
+          {
+            setEndDateError("Event end date is not valid")
+           
+          }
+          else if(startDate!==""&&value.getTime()<=startDate.getTime())
+          {
+            setEndDateError("Event end date is before start date")
+           
+          }
+         else if(startDate!==""&&getDiff(startDate,value)<5)
+          {
+            
+            setEndDateError("Event duration must be greater than 5 minutes")
+            
+          }
+          else
+          {
+            setEndDateError("")
+          }
+       
+        }
+      
         onUpdatefield(name,value)
+        
+        
     }
     const submitForm = (val) => e =>
     {
         e.preventDefault();
+        
         onAddEvent(agent.Events.create({...val,eventid:uuidv4()}))
     } 
     const theme = useTheme();
@@ -100,7 +172,7 @@ import { EVENT_ADD, UPDATE_EVENT_FIELD } from '../constants/actionTypes';
             Add & Event
           </Typography>
 
-          <form noValidate onSubmit={submitForm({title,description,startDate,endDate})} >
+          <form noValidate onSubmit={submitForm({title,description,startDate:startDate,endDate:endDate})} >
           <FormControl className={classes.field}>
 
 <TextField type="text"id="title" name="title" aria-describedby="titleError" label="Enter the event title" variant="outlined"
@@ -118,6 +190,7 @@ import { EVENT_ADD, UPDATE_EVENT_FIELD } from '../constants/actionTypes';
   onChange={e=>{ handleChange(e.target.name,e.target.value) }} />
 <FormHelperText  id="descriptionError"></FormHelperText>
 </FormControl>
+<FormControl className={classes.field}>
 <TextField
         id="StartDate"
         label="start of the event"
@@ -127,12 +200,16 @@ import { EVENT_ADD, UPDATE_EVENT_FIELD } from '../constants/actionTypes';
         value={getFormatDate(startDate)}
         variant="outlined"
         name="startDate"
-        className={classes.field}
+        error={startDateError !== ""}
+        aria-describedby="startDateError"
         onChange={e=>{ handleChange(e.target.name,parseDate(e.target.value)) }}
         InputLabelProps={{
           shrink: true,
         }}
       />
+      <FormHelperText  id="startDateError">{startDateError}</FormHelperText>
+      </FormControl>
+      <FormControl className={classes.field}>
         <TextField
         id="endDate"
         label="end of the event"
@@ -140,17 +217,20 @@ import { EVENT_ADD, UPDATE_EVENT_FIELD } from '../constants/actionTypes';
         variant="outlined"
         type="datetime-local"
         name="endDate"
+        aria-describedby="endDateError"
+        error={endDateError !== ""}
         inputProps={{min: getMinDate()}}
         onChange={e=>{ handleChange(e.target.name,parseDate(e.target.value)) }}
         value={getFormatDate(endDate)}
-        className={classes.field}
         InputLabelProps={{
           shrink: true,
         }}
       />
+      <FormHelperText  id="endDateError">{endDateError}</FormHelperText>
+      </FormControl>
             <Button 
             className={classes.field}
-            disabled={title===""||description===""||startDate===""||endDate===""}
+            disabled={title===""||description===""||startDate===""||endDate===""||startDateError!==""||endDateError!==""}
             type="submit" 
             variant="contained" color="secondary">
                 SUBMIT
@@ -168,7 +248,7 @@ import { EVENT_ADD, UPDATE_EVENT_FIELD } from '../constants/actionTypes';
       <div className={classes.root}>
         <CssBaseline />
        
-        <Button startIcon={<AddIcon/>} onClick={e=>{ handleDrawerToggle() }} variant="contained" color="secondary" >
+        <Button startIcon={<AddIcon/>} className={classes.addbutton} onClick={e=>{ handleDrawerToggle() }} variant="contained" color="secondary" >
         ADD TASK
       </Button>
         

@@ -16,6 +16,7 @@ import {
   export default (state = defaultState, action) => {
     switch (action.type) {
       case APP_LOAD:
+        console.log("helolo",action.payload)
         return {
           ...state,
           token:window.localStorage.getItem('token')||null,

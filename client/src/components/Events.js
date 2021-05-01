@@ -1,21 +1,10 @@
 import React from 'react';
 import { withStyles} from '@material-ui/core/styles';
-import DeleteIcon from '@material-ui/icons/Delete';
 import Avatar from '@material-ui/core/Avatar';
-
-import {
-  HOME_PAGE_LOADED,
-  HOME_PAGE_UNLOADED,
-  LOGOUT,
-  REDIRECT_TO_MAIN
-
-} from '../constants/actionTypes';
-
-
-import { Button, Grid,Card, Typography,Container,AppBar,Toolbar, IconButton,List, ListItem,CardActionArea,CardActions,CardContent, CardHeader } from '@material-ui/core';
+import { Button, Grid,Card, Typography,Container,AppBar,Toolbar, IconButton,List, ListItem,CardActionArea,CardActions,CardContent, CardHeader, Hidden } from '@material-ui/core';
 import moment from 'moment';
-import { dirname } from 'path';
-
+import EventView from './EventView';
+import EventDelete from './EventDelete';
 
 
 const useStyles = theme=>({
@@ -85,6 +74,26 @@ const useStyles = theme=>({
         backgroundColor: 'rgba(0,0,0,.1)',
         outline: '1px solid slategrey'
       }
+ },
+ noEventsimg:
+ {
+  width:"30%",height:"35vh",padding:0,display:"flex",margin:"auto",
+  [theme.breakpoints.down('xs')]: {
+     
+    height:"25vh",
+ 
+  },
+ },
+ noEventsMessage:
+ {
+  color:"black",fontWeight:"100",width:"fit-content",padding:0,
+  fontSize:"2rem",
+  [theme.breakpoints.down('xs')]: {
+     
+    fontSize:"1rem",
+ 
+  },
+ 
  }
 
 })
@@ -106,30 +115,30 @@ class Events extends React.Component {
         <Grid item>
               
         <Typography variant="body1" color="textSecondary">
-        Events
+      {moment(this.props.currentDate).format("LL")}
     </Typography>
         </Grid>
         <Grid item>
   
         <Typography variant="body2" color="textPrimary">
-      {moment(this.props.currentDate).format("LL")}
+        Events
     </Typography>
         </Grid>
         </Grid> 
       
   </Typography>
-  {events.length===0?
+  {events&&events.length===0?
   
   <Container  style={{padding:0,display:"flex",marginTop:"2rem",alignItems:"center",justifyContent:"center",flexDirection:"column-reverse"}}>
-    <Typography variant="h4" style={{color:"black",fontWeight:"100",width:"fit-content",padding:0}}>
+    <Typography className={classes.noEventsMessage}>
     No events on this day
   </Typography>
-     <img style={{width:"30%",height:"15rem",padding:0,display:"flex",margin:"auto"}} src="/images/noEvents.png"/>
+     <img className={classes.noEventsimg} src="/images/noEvents.png"/>
     </Container>
  
 
   :
-  <List className={classes.list}>
+  events&&(<List className={classes.list}>
       {events.map(item=>{
           return(<ListItem key={item.eventid}>
              <Card className={classes.cardContainer}>
@@ -141,9 +150,12 @@ class Events extends React.Component {
       }
       title={item.title}
       subheader={
-          <Typography noWrap style={{fontSize:"0.9rem",textOverflow:"ellipsis",width:"90%"}} color="textSecondary">
+   
+                <Typography noWrap style={{fontSize:"0.9rem",textOverflow:"ellipsis",width:"90%"}} color="textSecondary">
    {getFormatDate(item.startDate)+" - "+getFormatDate(item.endDate)}
           </Typography>
+      
+    
       } 
        
        />
@@ -156,17 +168,13 @@ class Events extends React.Component {
         </CardContent>
 
       <CardActions style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-        <Button size="small"  color="primary">
-          Edit
-        </Button>
-        <Button startIcon={<DeleteIcon/>} size="small" color="secondary">
-          delete
-        </Button>
+       <EventView event={item}/>
+    <EventDelete event={item}/>
       </CardActions>
     </Card>
           </ListItem>)
       })}
-  </List>}
+  </List>)}
  </Container>)
   }
 }

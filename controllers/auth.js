@@ -9,7 +9,6 @@ const signUp = async (req, res) => {
     });
     if (existingAccount) {
       return res.status(400).json({
-        error:{},
         message: "Account with same email already exists",
       });
     }
@@ -23,10 +22,13 @@ const signUp = async (req, res) => {
     });
     newUser = await newUser.save();
     console.log(newUser._id);
-    return res.status(200).json({ message: "Sign-up Completed",user:{name:req.body.name,email:req.body.email,events:[]} });
+    let token = "";
+  
+    token = jwt.sign({ _id:newUser._id }, process.env.USER_JWT_KEY);
+    return res.status(200).json({ message: "Sign-up Completed",user:{name:req.body.name,email:req.body.email,events:[],token:token} });
   } catch (e) {
     console.log(e);
-    res.status(400).json({ message: "Some error occured :(",error:e });
+    res.status(400).json({ message: "Some error occured :("});
   }
 }
 
@@ -35,12 +37,12 @@ const signIn = async (req, res) => {
     let user = await UserModel.findOne({ email: req.body.email });
  
     if (!user) {
-      return res.status(400).json({ message: "No such account found...",error:{} });
+      return res.status(400).json({ message: "No such account found.."});
     }
 
     const verify = bcrypt.compareSync(req.body.password, user.password);
     if (!verify) {
-      return res.status(400).json({ message: "Invalid Credentials.." ,error:{}});
+      return res.status(400).json({ message: "Invalid Credentials.." });
     }
 
     let token = "";
@@ -53,7 +55,7 @@ const signIn = async (req, res) => {
     });
   } catch (e) {
     console.log(e);
-    res.status(400).json({error:e, message: "Some error occured :(" });
+    res.status(400).json({ message: "Some error occured :(" });
   }
 }
 

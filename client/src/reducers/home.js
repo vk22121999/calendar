@@ -1,18 +1,12 @@
 import moment from 'moment';
-import { EVENT_ADD, EVENT_ORDER, HOME_PAGE_LOADED, HOME_PAGE_UNLOADED, SET_CURRENT_DATE } from '../constants/actionTypes';
+import { EVENT_ADD, EVENT_DELETE, EVENT_ORDER, EVENT_UPDATE, HOME_PAGE_LOADED, HOME_PAGE_UNLOADED, SET_CURRENT_DATE } from '../constants/actionTypes';
+import getColorCode from "../utils/RandomColorGenerator"
 
-function getColorCode() {
-  var makeColorCode = '0123456789ABCDEF';
-  var code = '#';
-  for (var count = 0; count < 6; count++) {
-     code =code+ makeColorCode[Math.floor(Math.random() * 16)];
-  }
-  return code;
-}
 const setColor = (events) =>
 {
-  return events.map(i=>{ i["color"] = getColorCode();  return i})
-  
+
+    return events.map(i=>{ i["color"] = getColorCode();  return i})
+
 }
 const setEventsOnDate = (events,currentDate) =>
 {
@@ -25,13 +19,14 @@ const setEventsOnDate = (events,currentDate) =>
   
 
 }
-
-export default (state = {events:[],currentDate:new Date(),currentEvents:[]}, action) => {
+const defaultState ={events:[],currentDate:new Date(),currentEvents:[]}
+export default (state =defaultState, action) => {
   let eventsTemp;
   switch (action.type) {
   
     case HOME_PAGE_LOADED:
-     eventsTemp = setColor(action.payload.events)
+      
+     eventsTemp = action.error?[]:setColor(action.payload.events)
       return {
         ...state,
         events: eventsTemp,
@@ -39,12 +34,22 @@ export default (state = {events:[],currentDate:new Date(),currentEvents:[]}, act
        
       };
     case EVENT_ADD:
-      eventsTemp = setColor(action.payload.events)
-      return{
-        ...state,
-        currentEvents:action.error?{...state.currentEvents}:setEventsOnDate(eventsTemp,state.currentDate),
-        events:action.error?{...state.events}:eventsTemp
-      }
+    case EVENT_UPDATE:
+    case EVENT_DELETE:
+     if(action.error!==undefined&&action.error)
+     {
+        return state
+     }
+     else
+     {
+       eventsTemp =setColor(action.payload.events)
+        return{
+          ...state,
+          currentEvents:setEventsOnDate(eventsTemp,state.currentDate),
+          events:eventsTemp
+        }
+     }
+        
     case SET_CURRENT_DATE:
       return{
         ...state,

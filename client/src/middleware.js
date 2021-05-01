@@ -32,9 +32,9 @@ const promiseMiddleware = store => next => action => {
         }
         console.log('ERROR', error);
         action.error = true;
-        action.payload = error.response.body;
+        action.payload = (error.response!==undefined&&error.response.body!==undefined)?error.response.body:{message:"Server is Down try after some time"};
         if (!action.skipTracking) {
-          store.dispatch({ type: ASYNC_END, promise: action.payload });
+          store.dispatch({ type: ASYNC_END, promise: action.payload ,error:true});
         }
         store.dispatch(action);
       }

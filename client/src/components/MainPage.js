@@ -8,6 +8,7 @@ import TextField from '@material-ui/core/TextField';
 import Container from '@material-ui/core/Container';
 import FormControl from '@material-ui/core/FormControl';
 
+
 import {
   UPDATE_FIELD_AUTH,
   LOGIN,
@@ -81,6 +82,7 @@ class MainPage extends React.Component {
     return (
 
        <Container style={{width:"100%",maxWidth:"100%"}}>
+               
       <div className="main">
       <div className="heading">
            <img className="main-icon" src="/images/calendar_MainIcon.png"/>

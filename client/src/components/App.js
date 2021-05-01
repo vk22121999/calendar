@@ -1,7 +1,7 @@
 import agent from '../agent';
 import React from 'react';
 import { connect } from 'react-redux';
-import { APP_LOAD, REDIRECT } from '../constants/actionTypes';
+import { ALERT_HIDE, APP_LOAD, REDIRECT } from '../constants/actionTypes';
 import { Route, Switch } from 'react-router-dom';
 import Home from '../components/Home';
 import MainPage from '../components/MainPage';
@@ -9,18 +9,24 @@ import { store } from '../store';
 import { push } from 'connected-react-router';
 import PrivateRoute from "../utils/PrivateRoute";
 import { ThemeProvider } from '@material-ui/styles';
-import { createMuiTheme } from '@material-ui/core';
+import { createMuiTheme, LinearProgress } from '@material-ui/core';
 import Reigister from './Reigister';
+import AlertComponent from "./Alert"
 
 const mapStateToProps = state => {
   return {
     currentUser: state.common.currentUser,
-    redirectTo: state.common.redirectTo
+    redirectTo: state.common.redirectTo,
+    appLoaded:state.common.appLoaded,
+    error:state.common.error,
+    message:state.common.message
   }};
 
 const mapDispatchToProps = dispatch => ({
   onLoad: (payload, token) =>
     dispatch({ type: APP_LOAD, payload, token, skipTracking: true }),
+  onAlertHide:() =>
+  dispatch({type:ALERT_HIDE}),
   onRedirect: () =>
     dispatch({ type: REDIRECT })
 });
@@ -32,11 +38,12 @@ const theme = createMuiTheme({
 })
 
 class App extends React.Component {
-    constructor()
+    constructor(props)
     {   super()
         this.state = {}
     }
 
+  
     static getDerivedStateFromProps(nextProps,prevState) {
     if (nextProps.redirectTo) {
      
@@ -49,7 +56,8 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    const token = window.localStorage.getItem('jwt');
+    const token = window.localStorage.getItem('token');
+
     if (token) {
       agent.setToken(token);
       
@@ -59,11 +67,11 @@ class App extends React.Component {
   }
 
   render() {
-    if (true||this.props.appLoaded) {
+    if (this.props.appLoaded) {
       return (
           <ThemeProvider theme={theme}>
-        <div>
-        
+        <div onClick={e=>{ if(this.props.error!==null) this.props.onAlertHide() }}>
+        <AlertComponent error={this.props.error} message={this.props.message} />
           <Switch>
             <Route exact path="/" component={MainPage}/>
             <Route exact path="/register" component={Reigister}/>
@@ -75,11 +83,13 @@ class App extends React.Component {
        
       );
     }
-    // return (
-    //   <div>
-    //       Loading..
-    //   </div>
-    // );
+    else
+    {
+      return (
+        <LinearProgress/>
+      );
+    }
+  
   }
 }
 

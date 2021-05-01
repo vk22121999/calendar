@@ -23,15 +23,15 @@ const addEvent = async (req, res) => {
     let user = await UserModel.findByIdAndUpdate( req.userData._id,{
       $push: {
         events: {
-           $each: [ {...newEvent,startDate:new Date(newEvent.startDate),endDate:new Date(newEvent.endDate)}],
-           $sort: { startDate: -1 },
+           $each: [ {...newEvent}],
+           $sort: { startDate: 1 },
 
         }
       }
     });
     let userNew = await UserModel.findById(req.userData._id);
 
-    res.status(200).json({ message: "Event Added" ,events:userNew.events});
+    res.status(200).json({ message: newEvent.title+" Event Added" ,events:userNew.events});
   } catch (e) {
     console.log(e);
     res.status(400).json({ message: "Some error occured :(" });
@@ -41,28 +41,29 @@ const updateEvent = async (req, res) => {
 
     const UpdateEvent = req.body;
   try {
-    let user = await UserModel.updateOne({_id:req.UserData._id,"events.eventid":req.params.eventid},{
+    let user = await UserModel.findOneAndUpdate({_id:req.userData._id,"events.eventid":req.params.eventid},{
         $set:{
             "events.$":UpdateEvent
         }
     });
-
-    res.status(200).json({ message: "Event Added" });
+    let userNew = await UserModel.findById(req.userData._id);
+    res.status(200).json({ message: UpdateEvent.title+" Event Updated",events:userNew.events });
   } catch (e) {
     console.log(e);
-    res.status(400).json({ message: "Some error occured :(" });
+    res.status(400).json({ message: " Some error occured :(" });
   }
 }
 const deleteEvent = async (req, res) => {
     try {
-      let user = await UserModel.updateOne({_id:req.UserData._id},{
+      let user = await UserModel.findOneAndUpdate({_id:req.userData._id},{
           $pull:{
               "events":{
                   "eventid":req.params.eventid
               }
           }
       });
-      res.status(200).json({ message: "Event deleted" });
+      let userNew = await UserModel.findById(req.userData._id);
+      res.status(200).json({ message: "Event Deleted",events:userNew.events });
     } catch (e) {
       console.log(e);
       res.status(400).json({ message: "Some error occured :(" });

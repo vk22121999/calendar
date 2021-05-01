@@ -10,6 +10,7 @@
   import FormHelperText from '@material-ui/core/FormHelperText';
   import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Container, Typography,TextField } from '@material-ui/core';
+import {getMinDate,getFormatDate,parseDate,getDiff} from "../utils/dateFormat";
   import moment from "moment";
   import { v4 as uuidv4 } from 'uuid';
 import { EVENT_ADD, UPDATE_EVENT_FIELD } from '../constants/actionTypes';
@@ -56,21 +57,11 @@ import { EVENT_ADD, UPDATE_EVENT_FIELD } from '../constants/actionTypes';
 
   }));
 
-  const getMinDate = () =>
-  {
-      return moment().format("yyyy-MM-DD")+"T"+moment().format("HH:mm")
-  }
-  const getFormatDate = (val) =>
-  {
-      return moment(val).format("yyyy-MM-DDTHH:mm")
-  }
-  const parseDate =(val) =>
-  {
-     return moment(val,"yyyy-MM-DDTHH:mm").toDate()
-  }
+
   const mapStateToProps = state => ({
     ...state.event,
-    ...state.home
+    ...state.home,
+    ...state.common
    
   });
   
@@ -83,12 +74,7 @@ import { EVENT_ADD, UPDATE_EVENT_FIELD } from '../constants/actionTypes';
      dispatch({type:EVENT_ADD,payload:payload})  
     });
 
-  const getDiff = (startDate,endDate) =>
-  {
-    var m1 = moment(startDate); 
-var m2 = moment(endDate); 
-  return m2.diff(m1,'minutes'); 
-  }
+  
   function ResponsiveDrawer(props) {
     const { window,title,description,startDate,endDate,onAddEvent,onUpdatefield } = props;
     const classes = useStyles();
@@ -155,6 +141,7 @@ var m2 = moment(endDate);
     const submitForm = (val) => e =>
     {
         e.preventDefault();
+        setMobileOpen(false);
         
         onAddEvent(agent.Events.create({...val,eventid:uuidv4()}))
     } 

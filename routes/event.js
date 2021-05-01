@@ -5,8 +5,8 @@ const ValidateReq = require("../middlewares/events/validate_req");
 const EventController = require("../controllers/events");
 
 router.get("/",EventController.fetchEvents)
-router.post("/add",Validators.addEventValidator,ValidateReq,EventController.addEvent);
-router.put("/update/:eventid", Validators.UpdateEventValidator,ValidateReq, EventController.updateEvent);
-router.delete("/delete/:eventid", Validators.DeleteEventValidator,ValidateReq, EventController.deleteEvent);
+router.post("/add",EventController.addEvent);
+router.put("/update/:eventid", EventController.updateEvent);
+router.delete("/delete/:eventid",EventController.deleteEvent);
 
 module.exports = router;

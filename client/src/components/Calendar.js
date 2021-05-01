@@ -3,7 +3,8 @@ import moment from "moment";
 import { makeStyles} from '@material-ui/core/styles';
 import Card from "@material-ui/core/Card"
 import Container from "@material-ui/core/Container"
-import { Button, Grid, IconButton, Typography, useTheme } from "@material-ui/core";
+import Grid from "@material-ui/core/Grid"
+import { Button, Hidden, Typography, useTheme } from "@material-ui/core";
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 
@@ -49,9 +50,14 @@ const useStyles = makeStyles(theme=>({
         
         backgroundColor:"white",
         width:"100%",
-       height:"29.1rem",
+       height:"60vh",
         borderRadius:"6px",
         padding:0,
+        [theme.breakpoints.down('xs')]: {
+       
+            height:"fit-content"
+         
+          },
     },
     calendarHeader:
     {
@@ -62,13 +68,13 @@ const useStyles = makeStyles(theme=>({
         padding:theme.spacing(2),
         backgroundColor:"pink",
       
-        height:"3rem"
+        height:"6vh"
     },
     calendarDay:
     {
         width:"14.28%",
         textAlign:"center",
-        height:"2rem",
+        height:"4vh",
         border:"solid 0.5px #efefef",        
         padding:theme.spacing(1)
     },
@@ -86,29 +92,36 @@ const useStyles = makeStyles(theme=>({
         padding:0
         
     },
+    buttonLabelMobile:{
+        minWidth:"15vh",height:"15vh",
+        display:"flex",
+        padding:"2px",
+        flexDirection:"column",
+        border:"solid 0.5px #efefef",        
+
+    },
     calendarDateMain:{
         width:"14.28%",
         borderRadius:0,
         textAlign:"right",
         padding:0,
-        height:"4rem",
+        paddingBottom:"3px",
+        height:"10vh",
     },
-      timeJ:
-    {
-      backgroundColor:"blue",
-      [theme.breakpoints.down('sm')]: {
-       
-        fontSize:"0.2rem",
-     
-      },
-      [theme.breakpoints.down('lg')]: {
-       
-        fontSize:"0.5rem",
-        backgroundColor:"red"
-     
-      },
-  
-    },
+   calendarDateMainMobile:{
+    padding:theme.spacing(1),overflowY:"auto",display:"flex",backgroundColor:"#efefef",height:"fit-content",
+    '&::-webkit-scrollbar': {
+        display:"none"
+       },
+       '&::-webkit-scrollbar-track': {
+         boxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)',
+         webkitBoxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)'
+       },
+       '&::-webkit-scrollbar-thumb': {
+         backgroundColor: 'rgba(0,0,0,.1)',
+         outline: '1px solid slategrey'
+       }
+   },
     disabled:{
         backgroundColor:"#ffefef"
     }
@@ -130,6 +143,7 @@ function Calendar(props)
     const handlenextMonth = () =>
     {
         const val = month.clone().add(1,"month");
+    
         setMonth(val)
         startDay = val.clone().startOf("month").startOf("week");
         endDay = val.clone().endOf("month").endOf("week");
@@ -146,6 +160,7 @@ function Calendar(props)
     const handleprevMonth = () =>
     {
         const val = month.clone().subtract(1,"month");
+        
         setMonth(val)
         startDay = val.clone().startOf("month").startOf("week");
         endDay = val.clone().endOf("month").endOf("week");
@@ -162,6 +177,7 @@ function Calendar(props)
 
     useEffect(() => {
         const calendarTemp = []
+
         while(day.isBefore(endDay,"day"))
         {
             calendarTemp.push(Array(7).fill(0).map(()=>day.add(1,"day").clone()))
@@ -184,6 +200,10 @@ function Calendar(props)
 
             </Button>
         </Container>
+        <Hidden 
+        xsDown
+        >
+
       <Container style={{width:"100%",display:"flex",padding:0}} >
           {["sun","mon","tue","wed","thu","fri","sat"].map(i=>{
               return(<Typography className={classes.calendarDay} variant="div" >
@@ -211,7 +231,10 @@ function Calendar(props)
 
                  
                   {month.isSame(day,'month')?setEventsOnDate(props.events,day.toDate()).map(i=>{
-                       return(<Container style={{width:getWidth(day,i.startDate,i.endDate),flex:1,margin:0,padding:0,backgroundColor:i.color}}>
+                       return(<Container style={{
+                         boxShadow:"0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)",
+                        maxHeight:"14px",
+                           width:getWidth(day,i.startDate,i.endDate),flex:1,margin:0,padding:0,backgroundColor:i.color}}>
                            
                        </Container>)
                   }):<span></span>}
@@ -225,7 +248,51 @@ function Calendar(props)
       })
 
       }
-    
+          </Hidden>        
+
+        <Hidden smUp>
+            <Container className={classes.calendarDateMainMobile}>
+
+        {calendar.map(week=>{
+         
+         return( 
+                  week.map(day=>{
+        if(month.isSame(day,"month"))
+                return(
+           <Button onClick={e=>{ props.handleCurrentDate(day.toDate())}}
+           classes={{label:classes.buttonLabelMobile}} 
+           style={{minWidth:"15vh",height:"15vh",textAlign:"right",padding:0,
+           display:"flex",flexDirection:"column",
+           padding:"2px",
+           backgroundColor:"white", boxShadow:"0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)",
+               border:moment(props.currentDate).isSame(month,"month")&&day.isSame(moment(props.currentDate),"day")?"solid 2px red":"solid 1px #efefef"}} >
+
+               <Typography style={{textAlign:"right",paddingRight:"10px",width:"95%",flex:1,color:day.isSame(moment(),"day")?"red":"gray",opacity:month.isSame(day,"month")||day.isSame(moment(),"days")?1:0.3}} variant="body2" color="textSecondary">
+                     {day.format("D")}
+               </Typography>
+               <Container style={{padding:0,display:"flex",flexDirection:"column-reverse",flex:2,margin:0}} >
+               {props.events&&setEventsOnDate(props.events,day.toDate()).map(i=>{
+                       return(<Container style={{
+                           maxHeight:"8px",
+                        boxShadow:"0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)",
+                           width:getWidth(day,i.startDate,i.endDate),flex:1,margin:0,padding:0,backgroundColor:i.color}}>
+                           
+                       </Container>)
+                })
+                }
+               </Container>
+               </Button>
+               )
+       })
+
+       
+            )
+   })
+
+   }
+                   
+                   </Container>
+        </Hidden>
 
     </Card>)
 }

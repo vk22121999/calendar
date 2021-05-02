@@ -2,34 +2,52 @@ import moment from 'moment';
 import { EVENT_ADD, EVENT_DELETE, EVENT_ORDER, EVENT_UPDATE, HOME_PAGE_LOADED, HOME_PAGE_UNLOADED, SET_CURRENT_DATE } from '../constants/actionTypes';
 import getColorCode from "../utils/RandomColorGenerator"
 
+
 const setColor = (events) =>
 {
+    let currentDate = new Date()
 
-    return events.map(i=>{ i["color"] = getColorCode();  return i})
+    return events.filter(i=>{ 
+      i["color"] = getColorCode();  
+    
+    if((moment(i.startDate).isAfter(moment(),"minutes"))
+    ||(new Date(i.startDate).getTime() < currentDate.getTime()&&currentDate.getTime()< new Date(i.endDate).getTime())
+    ||(moment(currentDate).isSame(new Date(i.startDate),"day")&& moment(new Date(i.endDate)).isAfter(moment(),"minutes"))
+    )
+
+    {
+      
+      return i
+    }
+        
+    })
 
 }
 const setEventsOnDate = (events,currentDate) =>
 {
  return events.filter( i => {
 
-  // console.log("",i.title,new Date(i.startDate).getTime() < currentDate.getTime() &&currentDate.getTime()< new Date(i.endDate).getTime())
+
   return ((moment(currentDate).isSame(new Date(i.startDate),"day")&& moment(new Date(i.endDate)).isAfter(moment(),"minutes"))
-  ||(new Date(i.startDate).getTime() < currentDate.getTime()&&currentDate.getTime()< new Date(i.endDate).getTime())
+  ||(new Date(i.startDate).getTime() < new Date(currentDate).getTime()&&new Date(currentDate).getTime()< new Date(i.endDate).getTime())
   )})
   
 
 }
-const defaultState ={events:[],currentDate:new Date(),currentEvents:[]}
+
+
+const defaultState ={events:[],homeLoaded:false,currentDate:new Date(),currentEvents:[]}
 export default (state =defaultState, action) => {
   let eventsTemp;
   switch (action.type) {
   
     case HOME_PAGE_LOADED:
       
-     eventsTemp = action.error?[]:setColor(action.payload.events)
+     eventsTemp = (action.error!==undefined&&action.error)?[]:setColor(action.payload.events)
       return {
         ...state,
-        events: eventsTemp,
+        events:eventsTemp,
+        homeLoaded:true,
         currentEvents:setEventsOnDate(eventsTemp,state.currentDate)
        
       };

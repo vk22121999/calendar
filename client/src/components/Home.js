@@ -13,7 +13,7 @@ import {
 
 } from '../constants/actionTypes';
 
-
+import { LinearProgress } from '@material-ui/core';
 import { Button, Grid, Typography } from '@material-ui/core';
 import ResponsiveDrawer from './ResponsiveDrawer';
 import moment from 'moment';
@@ -93,13 +93,14 @@ subheader:
 ,item:
 {
   display:"flex",
+  flexDirection:"row-reverse",
   alignItems:"center",
-  justifyContent:"center",
+  padding:"8px"
 
 }
 ,
 today:
-{  textAlign:"right",
+{  
   
 width:"100%",
   [theme.breakpoints.down('sm')]: {
@@ -142,10 +143,12 @@ class Home extends React.Component {
 
   render() {
     const {classes,theme} = this.props; 
-    return (
-      <Grid className={classes.main} spacing="2" container>
+    if(this.props.homeLoaded)
+
+      return (
+      <Grid className={classes.main} spacing={2} container>
   <Grid className={classes.header} item xs={12} lg={12} sm={12}>
-     <Grid className={classes.titleContainer} item xs={6}>
+     <Grid className={classes.titleContainer} item xs={3}>
      <img className={classes.img} src="/images/calendar_MainIcon.png" />
       
       <Typography className={classes.title} variant="h3" color="textSecondary">
@@ -153,27 +156,23 @@ class Home extends React.Component {
       </Typography>
        </Grid>
 
+       <Grid className={classes.item}  xs={4} item>
+  
+     <ResponsiveDrawer/>
+      </Grid>
+      <Grid className={classes.item} xs={5} item>
       <Button onClick={e=>{ this.props.logout() }} variant="contained" >
         Logout
       </Button>
+
+      </Grid>
+    
   
 
   </Grid>
 <Grid  xs={12} lg={12} sm={12}
  item
  className={classes.header}>
-  <Grid className={classes.subheader} container>
-    <Grid className={classes.item} xs={6} item>
-  
-    <ResponsiveDrawer/>
-    </Grid>
-    <Grid className={classes.item} xs={6} item>
-     <Typography className={classes.today} variant="h5" color="textSecondary">
-       {moment().format("LL")}
-       </Typography>
-    </Grid>
-  </Grid>
-
  
 </Grid>
 
@@ -189,6 +188,10 @@ class Home extends React.Component {
     
       </Grid>
     );
+    else
+        return(
+          <LinearProgress/>
+        )
   }
 }
 

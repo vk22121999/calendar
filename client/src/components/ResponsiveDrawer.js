@@ -46,7 +46,7 @@ import { EVENT_ADD, UPDATE_EVENT_FIELD } from '../constants/actionTypes';
     addbutton:
     {
       width:"100%",
-      padding:"0.8rem 2rem",
+      padding:"0.5rem 1.5rem",
       borderRadius:"25px",
        [theme.breakpoints.down('sm')]: {
         width: "100%",

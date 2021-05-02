@@ -97,7 +97,7 @@ class MainPage extends React.Component {
                 <Typography style={{textAlign:"center",marginBottom:theme.spacing(5)}} variant="h4" color="primary">
                     Login
                 </Typography>
-           <form noValidate onSubmit={this.submitForm(email,password)}>
+           <form  onSubmit={this.submitForm(email,password)}>
                 <Container style={{ width:"90%",alignItems:"center",margin:"auto",justifyContent:"center" ,display:"flex",flexDirection:"column" }}>
                 <FormControl className={classes.field}>
 

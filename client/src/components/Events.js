@@ -14,7 +14,7 @@ const useStyles = theme=>({
       
       backgroundColor:"#efefef",
       width:"100%",
-     height:"60vh",
+     height:"64vh",
       borderRadius:"6px",
       padding:0,
       position:"realtive",
@@ -101,6 +101,20 @@ const getFormatDate = (val) =>
 {
   return moment(val).format("Do MMM LT")
 }
+const setEventStatus = (i,currentDate) =>
+{
+ 
+  
+  if(moment(currentDate).isSame(new Date(i.startDate),"day")&& moment(new Date(i.endDate)).isAfter(moment(),"minutes"))
+    return "New Event"
+  if(new Date(i.startDate).getTime() < currentDate.getTime()&&currentDate.getTime()< new Date(i.endDate).getTime())
+    return "In Progress"
+  else
+    return "New Event"
+
+  
+
+}
 class Events extends React.Component {
  
 
@@ -110,7 +124,7 @@ class Events extends React.Component {
     const {classes,theme,events} = this.props; 
  return(<Container className={classes.mainEvents
  }>
-  <Typography className={classes.headerEvents} variant="div" >
+  <Typography className={classes.headerEvents} >
     <Grid conatiner>
         <Grid item>
               
@@ -150,11 +164,12 @@ class Events extends React.Component {
       }
       title={item.title}
       subheader={
-   
-                <Typography noWrap style={{fontSize:"0.9rem",textOverflow:"ellipsis",width:"90%"}} color="textSecondary">
+  
+       <Typography noWrap style={{fontSize:"0.9rem",textOverflow:"ellipsis",width:"90%"}} color="textSecondary">
    {getFormatDate(item.startDate)+" - "+getFormatDate(item.endDate)}
           </Typography>
-      
+ 
+
     
       } 
        

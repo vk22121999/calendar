@@ -99,7 +99,7 @@ class Register extends React.Component {
                 <Typography style={{textAlign:"center",marginBottom:theme.spacing(3)}} variant="h4" color="secondary">
                     Register
                 </Typography>
-           <form noValidate onSubmit={ this.submitFormRegister(username,email,password)}>
+           <form onSubmit={ this.submitFormRegister(username,email,password)}>
                 <Container style={{ width:"90%",alignItems:"center",margin:"auto",justifyContent:"center" ,display:"flex",flexDirection:"column" }}>
                 <FormControl className={classes.field}>
 

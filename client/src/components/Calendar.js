@@ -50,7 +50,7 @@ const useStyles = makeStyles(theme=>({
         
         backgroundColor:"white",
         width:"100%",
-       height:"60vh",
+       height:"64vh",
         borderRadius:"6px",
         padding:0,
         [theme.breakpoints.down('xs')]: {
@@ -74,6 +74,9 @@ const useStyles = makeStyles(theme=>({
     {
         width:"14.28%",
         textAlign:"center",
+        display:"flex",
+        alignItems:"center",
+        justifyContent:"center",
         height:"4vh",
         border:"solid 0.5px #efefef",        
         padding:theme.spacing(1)
@@ -105,8 +108,7 @@ const useStyles = makeStyles(theme=>({
         borderRadius:0,
         textAlign:"right",
         padding:0,
-        paddingBottom:"3px",
-        height:"10vh",
+        height:"9vh",
     },
    calendarDateMainMobile:{
     padding:theme.spacing(1),overflowY:"auto",display:"flex",backgroundColor:"#efefef",height:"fit-content",
@@ -206,7 +208,7 @@ function Calendar(props)
 
       <Container style={{width:"100%",display:"flex",padding:0}} >
           {["sun","mon","tue","wed","thu","fri","sat"].map(i=>{
-              return(<Typography className={classes.calendarDay} variant="div" >
+              return(<Typography className={classes.calendarDay}>
                   {i}
                   </Typography>)
           })
@@ -264,6 +266,7 @@ function Calendar(props)
            style={{minWidth:"15vh",height:"15vh",textAlign:"right",padding:0,
            display:"flex",flexDirection:"column",
            padding:"2px",
+           margin:"8px",
            backgroundColor:"white", boxShadow:"0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)",
                border:moment(props.currentDate).isSame(month,"month")&&day.isSame(moment(props.currentDate),"day")?"solid 2px red":"solid 1px #efefef"}} >
 
